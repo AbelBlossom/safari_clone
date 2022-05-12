@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:remaths/remaths.dart';
 import 'package:safari_clone/ui/common.dart';
@@ -47,7 +48,16 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
               // print("$diff $index");
               return Transform.translate(
                 offset: Offset(diff * w, 0),
-                child: const TabItem(),
+                child: CupertinoContextMenu(
+                    previewBuilder: (context, animation, child) {
+                      return child;
+                    },
+                    actions: const [
+                      CupertinoContextMenuAction(
+                        child: Text("Here"),
+                      ),
+                    ],
+                    child: const TabItem()),
               );
             }).toList(),
           );
