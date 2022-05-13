@@ -21,7 +21,7 @@ class _TabbarState extends State<Tabbar> {
     return ClipRect(
       child: Container(
         // height: 110,
-        color: Colors.black12,
+        color: Colors.white60,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Column(

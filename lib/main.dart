@@ -1,11 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:provider/provider.dart';
 import 'package:safari_clone/ui/browser.dart';
 import 'package:safari_clone/ui/pages/test.dart';
+import 'package:safari_clone/ui/provider/ui_manager.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MultiProvider(
+      providers: [Provider(create: (_) => UIManager())], child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
