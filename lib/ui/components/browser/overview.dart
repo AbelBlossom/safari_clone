@@ -40,7 +40,7 @@ class _TabsOverviewState extends State<TabsOverview> {
                 });
                 widget.goTO(index);
                 // Future.delayed(const Duration(milliseconds: 3000), () {
-                uiManager.navigatorKey.currentState?.pushNamed("/");
+                uiManager.navigatorKey.currentState?.pop();
                 // });
               },
               child: Container(
