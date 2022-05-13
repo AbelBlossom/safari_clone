@@ -27,7 +27,7 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
   void initState() {
     _offset = 0.0.asTweenable(this);
     _iPage = 0.0.asTweenable(this);
-    _y = 0.0.asTweenable(this);
+    _y = 1.0.asTweenable(this);
     super.initState();
   }
 

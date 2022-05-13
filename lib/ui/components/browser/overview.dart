@@ -12,38 +12,31 @@ class TabsOverview extends StatefulWidget {
 }
 
 class _TabsOverviewState extends State<TabsOverview> {
-  int? _i;
-
   @override
   Widget build(BuildContext context) {
     var uiManager = context.read<UIManager>();
     return GridView.count(
       crossAxisCount: 2,
-      mainAxisSpacing: 20,
-      crossAxisSpacing: 20,
+      mainAxisSpacing: 10,
+      crossAxisSpacing: 10,
+      childAspectRatio: 4 / 5,
+      padding: const EdgeInsets.all(10),
       children: uiManager.tabs.map((index) {
         return Hero(
           //  [index].contains(uiManager.selectedPage)
           // ? "tab_$index"
           // : "$index"
           tag: "tab_$index",
-          child: Opacity(
-            opacity: _i == null
-                ? 1
-                : _i == index
-                    ? 1
-                    : 0,
-            child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  _i = index;
-                });
-                widget.goTO(index);
-                // Future.delayed(const Duration(milliseconds: 3000), () {
-                uiManager.navigatorKey.currentState?.pop();
-                // });
-              },
-              child: Container(
+          child: GestureDetector(
+            onTap: () {
+              widget.goTO(index);
+              // Future.delayed(const Duration(milliseconds: 3000), () {
+              uiManager.navigatorKey.currentState?.pop();
+              // });
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
                 color: index % 2 == 0
                     ? CupertinoColors.activeBlue
                     : CupertinoColors.activeGreen,

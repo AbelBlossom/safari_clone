@@ -1,7 +1,10 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
+import 'package:safari_clone/ui/components/browser/background.dart';
 import 'package:safari_clone/ui/components/browser/overview.dart';
 import 'package:safari_clone/ui/components/browser/view_list.dart';
 import 'package:safari_clone/ui/components/tab_bar/tab_bar.dart';
@@ -26,10 +29,12 @@ class _BrowserState extends State<Browser> {
         body: CupertinoPageScaffold(
           child: Stack(
             children: [
-              Positioned.fill(
-                child: Container(
-                  color: CupertinoColors.darkBackgroundGray,
-                ),
+              const Positioned(
+                top: 0,
+                bottom: 0,
+                right: 0,
+                left: 0,
+                child: BrowserBackground(),
               ),
               Positioned.fill(
                 child: Navigator(
