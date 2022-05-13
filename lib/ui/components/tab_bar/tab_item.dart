@@ -14,7 +14,7 @@ class TabItem extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 5),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Colors.white70,
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
