@@ -48,26 +48,30 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
             details.globalPosition.dy.interpolate([0, _startY], [0.0, 1.0]));
       },
       onPanEnd: (_det) {
-        var to = math.max(
-            math.min(uiManager.page.round(), uiManager.tabSize) * w, 0.0);
+        var toPage = uiManager.page.round();
+        var to = math.max(toPage * w, 0.0);
         _offset.value = withSpring(to);
         uiManager.setY(withSpring(1.0));
         _iPage.value = 0;
-        uiManager.selectedPage = to.toInt();
+        uiManager.selectedPage = toPage;
 
-        goToPage(int page) {
+        uiManager.gotoFunc = (int page) {
           var to = math.max(math.min(page, uiManager.tabSize) * w, 0.0);
           _offset.value = withSpring(to);
           uiManager.setY(withSpring(1.0));
           _iPage.value = 0;
           uiManager.selectedPage = to.toInt();
-        }
+        };
 
         openOverView() {
-          uiManager.navigatorKey.currentState?.push(MaterialPageRoute(
-              builder: (_) => TabsOverview(
-                    goTO: goToPage,
-                  )));
+          uiManager.navigatorKey.currentState?.push(
+            PageRouteBuilder(
+                maintainState: true,
+                pageBuilder: (context, animation, secondaryAnimation) {
+                  return ScaleTransition(
+                      scale: animation, child: const TabsOverview());
+                }),
+          );
         }
 
         if (uiManager.yVal < 0.5) {
@@ -76,10 +80,12 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
 
         if (_det.velocity.pixelsPerSecond.dy.abs() > 2000) {
           if (uiManager.yVal < 0.7) {
-            uiManager.navigatorKey.currentState?.pushNamed("/overview");
+            // uiManager.navigatorKey.currentState?.pushNamed("/overview");
             return openOverView();
           }
         }
+
+        // uiManager.gotoPage(toPage);
       },
       child: AnimatedBuilder(
         animation: _offset.notifier,

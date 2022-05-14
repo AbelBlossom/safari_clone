@@ -4,7 +4,7 @@ import 'package:remaths/remaths.dart';
 class UIManager {
   // Testing Tabs
   // the numbers indicates the index of the tabs
-  List<int> tabs = [0, 1, 2, 3, 4];
+  List<int> tabs = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
   GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -29,6 +29,16 @@ class UIManager {
 
   ValueNotifier<double> offsetListener = ValueNotifier<double>(0.0);
   ValueNotifier<double> yListener = ValueNotifier<double>(0.0);
+
+  void Function(int page)? _gotoPage;
+  set gotoFunc(void Function(int page) func) {
+    _gotoPage = func;
+  }
+
+  gotoPage(int page) {
+    if (_gotoPage == null) return;
+    _gotoPage!(page);
+  }
 
   double get page => _page == null ? 0.0 : _page!.value;
 
