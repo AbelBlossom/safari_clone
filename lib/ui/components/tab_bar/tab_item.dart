@@ -1,9 +1,39 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:safari_clone/ui/common.dart';
+import 'package:provider/provider.dart';
+import 'package:safari_clone/ui/common/constants.dart';
+import 'package:safari_clone/ui/provider/ui_manager.dart';
+import 'package:remaths/remaths.dart';
 
 class TabItem extends StatelessWidget {
   const TabItem({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final uiManager = context.read<UIManager>();
+    return AnimatedBuilder(
+      animation: uiManager.offsetListener,
+      builder: (_, child) {
+        var offset = uiManager.swapListener.value.interpolate(
+          [0.0, 1.0],
+          [0.0, -200.0],
+          Extrapolate.CLAMP,
+        );
+        //TODO: animate the tab items from the top when switch between overview
+
+        // print("swap ${uiManager.swapListener.value}");
+        return Transform.translate(
+          offset: Offset.zero,
+          child: child,
+        );
+      },
+      child: const _TabItemContent(),
+    );
+  }
+}
+
+class _TabItemContent extends StatelessWidget {
+  const _TabItemContent({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +44,7 @@ class TabItem extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 5),
         decoration: BoxDecoration(
-          color: Colors.white70,
+          color: Colors.white54,
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(

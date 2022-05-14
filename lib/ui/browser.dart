@@ -4,10 +4,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
-import 'package:safari_clone/ui/components/browser/background.dart';
+import 'package:safari_clone/ui/common/widgets/background.dart';
 import 'package:safari_clone/ui/components/browser/overview.dart';
 import 'package:safari_clone/ui/components/browser/view_list.dart';
 import 'package:safari_clone/ui/components/tab_bar/tab_bar.dart';
+import 'package:safari_clone/ui/components/tab_bar/tab_bar_switcher.dart';
 import 'package:safari_clone/ui/provider/ui_manager.dart';
 
 class Browser extends StatefulWidget {
@@ -59,7 +60,7 @@ class _BrowserState extends State<Browser> {
                 bottom: 0,
                 left: 0,
                 right: 0,
-                child: Tabbar(),
+                child: TabBarSwitcher(),
               ),
             ],
           ),

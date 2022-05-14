@@ -1,9 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:remaths/remaths.dart';
-import 'package:safari_clone/ui/common.dart';
+import 'package:safari_clone/ui/common/constants.dart';
 import 'package:safari_clone/ui/components/browser/overview.dart';
 import 'package:safari_clone/ui/components/tab_bar/tab_item.dart';
 import 'dart:math' as math;
@@ -21,6 +20,7 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
   late Tweenable _offset;
   late Tweenable _iPage;
   late Tweenable _y;
+  late Tweenable swap;
   double _startY = 0.0;
 
   @override
@@ -28,6 +28,7 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
     _offset = 0.0.asTweenable(this);
     _iPage = 0.0.asTweenable(this);
     _y = 1.0.asTweenable(this);
+    swap = 0.0.asTweenable(this);
     super.initState();
   }
 
@@ -38,6 +39,7 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
     final uiManager = context.read<UIManager>();
     uiManager.initPage(_iPage);
     uiManager.initHPos(_y);
+    uiManager.initSwap(swap);
     return GestureDetector(
       onPanStart: (det) {
         _startY = det.globalPosition.dy + 100;
@@ -53,25 +55,46 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
         _offset.value = withSpring(to);
         uiManager.setY(withSpring(1.0));
         _iPage.value = 0;
-        uiManager.selectedPage = toPage;
+        setState(() {
+          uiManager.selectedPage = toPage;
+        });
 
-        uiManager.gotoFunc = (int page) {
+        uiManager.gotoFunc = (int page, [bool withAnim = true]) {
           var to = math.max(math.min(page, uiManager.tabSize) * w, 0.0);
-          _offset.value = withSpring(to);
-          uiManager.setY(withSpring(1.0));
+          if (withAnim) {
+            _offset.value = withSpring(to);
+            uiManager.setY(withSpring(1.0));
+          } else {
+            _offset.value = to;
+            uiManager.setY(1.0);
+          }
           _iPage.value = 0;
           uiManager.selectedPage = to.toInt();
         };
 
         openOverView() {
+          uiManager.setSwap(1);
+          if (uiManager.selectedPage > 3) {
+            // if(uiManager.scrollController.)
+            // uiManager.scrollController
+            //     .jumpTo((uiManager.selectedPage / 2) * 300);
+          }
           uiManager.navigatorKey.currentState?.push(
             PageRouteBuilder(
-                maintainState: true,
-                pageBuilder: (context, animation, secondaryAnimation) {
-                  return ScaleTransition(
-                      scale: animation, child: const TabsOverview());
-                }),
+              maintainState: true,
+              pageBuilder: (context, animation, secondaryAnimation) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: ScaleTransition(
+                    scale: animation.drive(Tween(begin: 0.7, end: 1.0)),
+                    child: const TabsOverview(),
+                  ),
+                );
+              },
+            ),
           );
+
+          // uiManager.navigatorKey.currentState?.pop();
         }
 
         if (uiManager.yVal < 0.5) {

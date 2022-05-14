@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:remaths/remaths.dart';
-import 'package:safari_clone/ui/components/browser/background.dart';
+import 'package:safari_clone/ui/common/widgets/background.dart';
 import 'package:safari_clone/ui/provider/ui_manager.dart';
 
 class TabViewList extends StatefulWidget {

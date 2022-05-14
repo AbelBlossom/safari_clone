@@ -19,6 +19,15 @@ class UIManager {
   // this value ranges from [0,0] interpolation of [0, ScreenHeight]
   Tweenable? y;
 
+  Tweenable? swap;
+
+  ValueNotifier<double> swapListener = ValueNotifier(0);
+
+  setSwap(int value) {
+    if (swap == null) return;
+    swap?.value = withTiming(value.toDouble());
+  }
+
   setY(dynamic val) {
     if (y != null) {
       y?.value = val;
@@ -30,14 +39,16 @@ class UIManager {
   ValueNotifier<double> offsetListener = ValueNotifier<double>(0.0);
   ValueNotifier<double> yListener = ValueNotifier<double>(0.0);
 
-  void Function(int page)? _gotoPage;
-  set gotoFunc(void Function(int page) func) {
+  void Function(int page, [bool withAnim])? _gotoPage;
+  set gotoFunc(void Function(int page, [bool withAnim]) func) {
     _gotoPage = func;
   }
 
-  gotoPage(int page) {
+  ScrollController scrollController = ScrollController();
+
+  gotoPage(int page, [bool withAnim = true]) {
     if (_gotoPage == null) return;
-    _gotoPage!(page);
+    _gotoPage!(page, withAnim);
   }
 
   double get page => _page == null ? 0.0 : _page!.value;
@@ -48,10 +59,19 @@ class UIManager {
     }
   }
 
+  initSwap(Tweenable _val) {
+    if (swap == null) {
+      swap = _val;
+      _val.addEventListener((value) {
+        swapListener.value = value;
+      });
+    }
+  }
+
   initHPos(Tweenable _val) {
     if (y == null) {
       y = _val;
-      y!.addEventListener((value) {
+      _val.addEventListener((value) {
         yListener.value = value;
       });
     }
