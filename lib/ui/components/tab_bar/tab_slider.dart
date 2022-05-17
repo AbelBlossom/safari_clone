@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:remaths/remaths.dart';
@@ -7,7 +8,7 @@ import 'package:safari_clone/ui/components/browser/overview.dart';
 import 'package:safari_clone/ui/components/tab_bar/tab_item.dart';
 import 'dart:math' as math;
 
-import 'package:safari_clone/ui/provider/ui_manager.dart';
+import 'package:safari_clone/provider/ui_manager.dart';
 
 class TabSlider extends StatefulWidget {
   const TabSlider({Key? key}) : super(key: key);
@@ -45,17 +46,25 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
         _startY = det.globalPosition.dy + 100;
       },
       onPanUpdate: (details) {
-        _offset.value += details.delta.dx;
+        //FIXME: animation don't work with single tab
+        _offset.value -= details.delta.dx;
         uiManager.setY(
             details.globalPosition.dy.interpolate([0, _startY], [0.0, 1.0]));
+
+        // if (uiManager.page < -0.2) {
+        //   print(true);
+        // }
       },
       onPanEnd: (_det) {
-        var toPage = uiManager.page.round();
-        var to = math.max(toPage * w, 0.0);
-        _offset.value = withSpring(to);
-        uiManager.setY(withSpring(1.0));
-        _iPage.value = 0;
+        if (uiManager.page < -0.6) {
+          //TODO: create a new page
+        }
         setState(() {
+          var toPage = uiManager.page.round();
+          var to = math.max(toPage * w, 0.0);
+          _offset.value = withSpring(to);
+          uiManager.setY(withSpring(1.0));
+          _iPage.value = 0;
           uiManager.selectedPage = toPage;
         });
 
@@ -72,40 +81,14 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
           uiManager.selectedPage = to.toInt();
         };
 
-        openOverView() {
-          uiManager.setSwap(1);
-          if (uiManager.selectedPage > 3) {
-            // if(uiManager.scrollController.)
-            // uiManager.scrollController
-            //     .jumpTo((uiManager.selectedPage / 2) * 300);
-          }
-          uiManager.navigatorKey.currentState?.push(
-            PageRouteBuilder(
-              maintainState: true,
-              pageBuilder: (context, animation, secondaryAnimation) {
-                return FadeTransition(
-                  opacity: animation,
-                  child: ScaleTransition(
-                    scale: animation.drive(Tween(begin: 0.7, end: 1.0)),
-                    child: const TabsOverview(),
-                  ),
-                );
-              },
-            ),
-          );
-
-          // uiManager.navigatorKey.currentState?.pop();
-        }
-
         if (uiManager.yVal < 0.5) {
-          return openOverView();
+          uiManager.openOverView();
+          return;
         }
-
+        // print(_det.velocity.pixelsPerSecond.dy.abs());
         if (_det.velocity.pixelsPerSecond.dy.abs() > 2000) {
-          if (uiManager.yVal < 0.7) {
-            // uiManager.navigatorKey.currentState?.pushNamed("/overview");
-            return openOverView();
-          }
+          uiManager.openOverView();
+          return;
         }
 
         // uiManager.gotoPage(toPage);
@@ -114,29 +97,92 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
         animation: _offset.notifier,
         builder: (context, child) {
           return Stack(
-            children: uiManager.tabs.map((index) {
-              uiManager.page = _offset.interpolate(
-                  [0.0, w * uiManager.tabSize.toDouble()],
-                  [0.0, uiManager.tabSize.toDouble()]);
+            children: [
+              ...uiManager.tabs.map((index) {
+                uiManager.page = _offset.interpolate<double>(
+                    [0.0, w * uiManager.tabSize],
+                    [0.0, uiManager.tabSize.toDouble()]);
 
-              //FIXME: maybe there is a better way to handle this, lol
-              SchedulerBinding.instance?.addPostFrameCallback((_) {
-                uiManager.offsetListener.value = _offset.value;
-              });
-              var diff = uiManager.page - index;
-              // print("page is ${uiManager.page}");
-              return Transform.translate(
-                offset: Offset(diff * w, 0),
-                child: CupertinoContextMenu(actions: const [
-                  CupertinoContextMenuAction(
-                    child: Text("Here"),
-                  ),
-                ], child: const TabItem()),
-              );
-            }).toList(),
+                //FIXME: maybe there is a better way to handle this, lol
+                SchedulerBinding.instance.addPostFrameCallback((_) {
+                  uiManager.offsetListener.value = _offset.value;
+                });
+                var diff = uiManager.page - index;
+                // print("page is ${uiManager.page}");
+                return Transform.translate(
+                  offset: Offset(-(diff * w), 0),
+                  child: const TabItem(),
+                );
+              }).toList(),
+              Positioned(
+                top: 5,
+                right: 0,
+                child: Builder(builder: ((context) {
+                  final item_with = size.width - CONSTANTS.TABITEM_OFFSET;
+                  var width = uiManager.page.interpolate<double>([
+                    uiManager.tabSize.toDouble(),
+                    uiManager.tabSize.toDouble() + 1.0,
+                  ], [
+                    0,
+                    item_with,
+                  ], Extrapolate.CLAMP);
+                  var _co = width.interpolate<double>(
+                      [100, item_with], [0, 1], Extrapolate.CLAMP);
+
+                  return Container(
+                    width: width,
+                    child: NewTabItem(
+                      showContent: width > item_with * 0.8,
+                    ),
+                  );
+                })),
+              ),
+            ],
           );
         },
       ),
+    );
+  }
+}
+
+class NewTabItem extends StatelessWidget {
+  final bool showContent;
+  const NewTabItem({Key? key, this.showContent = true}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: CONSTANTS.TABITEM_HEIGHT,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white54,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: showContent
+          ? Row(
+              children: const [
+                Icon(
+                  CupertinoIcons.search,
+                  color: Colors.grey,
+                  size: 16,
+                ),
+                SizedBox(width: 5),
+                Expanded(
+                  child: Text(
+                    "Search or Enter website",
+                    overflow: TextOverflow.fade,
+                  ),
+                ),
+              ],
+            )
+          : Container(),
     );
   }
 }

@@ -9,7 +9,7 @@ import 'package:safari_clone/ui/components/browser/overview.dart';
 import 'package:safari_clone/ui/components/browser/view_list.dart';
 import 'package:safari_clone/ui/components/tab_bar/tab_bar.dart';
 import 'package:safari_clone/ui/components/tab_bar/tab_bar_switcher.dart';
-import 'package:safari_clone/ui/provider/ui_manager.dart';
+import 'package:safari_clone/provider/ui_manager.dart';
 
 class Browser extends StatefulWidget {
   const Browser({Key? key}) : super(key: key);

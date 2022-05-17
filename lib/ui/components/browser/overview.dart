@@ -3,7 +3,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 import 'package:remaths/remaths.dart';
 import 'package:safari_clone/ui/common/widgets/background.dart';
-import 'package:safari_clone/ui/provider/ui_manager.dart';
+import 'package:safari_clone/provider/ui_manager.dart';
 
 class TabsOverview extends StatefulWidget {
   const TabsOverview({Key? key}) : super(key: key);

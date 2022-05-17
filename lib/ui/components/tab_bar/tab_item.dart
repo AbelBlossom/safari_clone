@@ -2,9 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:safari_clone/ui/common/constants.dart';
-import 'package:safari_clone/ui/provider/ui_manager.dart';
+import 'package:safari_clone/provider/ui_manager.dart';
 import 'package:remaths/remaths.dart';
 
+// Update the search bar when the user is trying to enter some text
 class TabItem extends StatelessWidget {
   const TabItem({Key? key}) : super(key: key);
 
@@ -54,40 +55,16 @@ class _TabItemContent extends StatelessWidget {
             ),
           ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 0.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              CupertinoButton(
-                padding: EdgeInsets.zero,
-                child: const Icon(
-                  CupertinoIcons.textformat_size,
-                  size: 15,
-                  color: Colors.black,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Stack(
+            children: const [
+              Positioned(bottom: 0, left: 0, right: 0, child: ProgressBar()),
+              Positioned.fill(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 0.0),
+                  child: TabContent(),
                 ),
-                onPressed: () {},
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    CupertinoIcons.lock_fill,
-                    size: 12,
-                    color: Colors.grey[700],
-                  ),
-                  const Text("microsoft.com"),
-                ],
-              ),
-              // create cupertino icon button
-              CupertinoButton(
-                padding: EdgeInsets.zero,
-                child: const Icon(
-                  CupertinoIcons.refresh_bold,
-                  size: 15,
-                  color: Colors.black,
-                ),
-                onPressed: () {},
               ),
             ],
           ),
@@ -96,3 +73,78 @@ class _TabItemContent extends StatelessWidget {
     );
   }
 }
+
+class ProgressBar extends StatelessWidget {
+  const ProgressBar({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.bottomLeft,
+      child: FractionallySizedBox(
+        widthFactor: 0.2,
+        child: Container(
+          color: CupertinoTheme.of(context).primaryColor,
+          height: 2,
+          width: MediaQuery.of(context).size.width - CONSTANTS.TABITEM_OFFSET,
+        ),
+      ),
+    );
+  }
+}
+
+class TabContent extends StatelessWidget {
+  const TabContent({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: const Icon(
+            CupertinoIcons.textformat_size,
+            size: 15,
+            color: Colors.black,
+          ),
+          onPressed: () {},
+        ),
+        Expanded(
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Icon(
+              CupertinoIcons.lock_fill,
+              size: 15,
+              color: Colors.grey[700],
+            ),
+            const Text("https://url.com")
+          ]),
+        ),
+        // create cupertino icon button
+        CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: const Icon(
+            CupertinoIcons.refresh_bold,
+            size: 15,
+            color: Colors.black,
+          ),
+          onPressed: () {},
+        ),
+      ],
+    );
+  }
+}
+
+
+// class NewTabContent extends StatefulWidget {
+//   const NewTabContent({Key? key}) : super(key: key);
+
+//   @override
+//   State<NewTabContent> createState() => _NewTabContentState();
+// }
+
+// class _NewTabContentState extends State<NewTabContent> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row();
+//   }
+// }

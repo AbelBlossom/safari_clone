@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:remaths/remaths.dart';
+import 'package:safari_clone/ui/components/browser/overview.dart';
 
-class UIManager {
-  // Testing Tabs
-  // the numbers indicates the index of the tabs
-  List<int> tabs = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+class UIManager extends ChangeNotifier {
+  //TODO: make this dynamic and implete the tabs switching
+  List<int> tabs = [0, 1];
 
   GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -59,6 +59,12 @@ class UIManager {
     }
   }
 
+  createNewTab() {
+    tabs.add(tabs.length);
+    selectedPage = tabs.length - 1;
+    notifyListeners();
+  }
+
   initSwap(Tweenable _val) {
     if (swap == null) {
       swap = _val;
@@ -84,4 +90,23 @@ class UIManager {
   }
 
   bool get _hasPage => _page != null;
+
+  openOverView() {
+    setSwap(1);
+
+    navigatorKey.currentState?.push(
+      PageRouteBuilder(
+        maintainState: true,
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return FadeTransition(
+            opacity: animation,
+            child: ScaleTransition(
+              scale: animation.drive(Tween(begin: 0.7, end: 1.0)),
+              child: const TabsOverview(),
+            ),
+          );
+        },
+      ),
+    );
+  }
 }

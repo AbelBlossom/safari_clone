@@ -4,30 +4,21 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 import 'package:safari_clone/ui/browser.dart';
 import 'package:safari_clone/ui/pages/test.dart';
-import 'package:safari_clone/ui/provider/ui_manager.dart';
+import 'package:safari_clone/provider/ui_manager.dart';
 
 void main() {
-  runApp(MultiProvider(
-      providers: [Provider(create: (_) => UIManager())], child: const MyApp()));
+  runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => UIManager())],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    // return MaterialApp(
-    //   debugShowCheckedModeBanner: false,
-    //   title: 'Flutter Demo',
-    //   theme: ThemeData(
-    //     primarySwatch: Colors.blue,
-    //   ),
-    //   initialRoute: "/",
-    //   routes: <String, WidgetBuilder>{
-    //     '/': (BuildContext context) => const CupertinoScaffold(body: Browser()),
-    //     "/test": (context) => const CupertinoScaffold(body: TestPage())
-    //   },
-    // );
-
     return CupertinoApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
