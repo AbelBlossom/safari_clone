@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:safari_clone/ui/common/constants.dart';
 import 'package:safari_clone/ui/common/widgets/blur_widget.dart';
+import 'package:safari_clone/ui/components/tab_bar/overview_bar.dart';
 import 'package:safari_clone/ui/components/tab_bar/tab_bar.dart';
 import 'package:safari_clone/provider/ui_manager.dart';
 import 'package:remaths/remaths.dart';
@@ -23,7 +24,7 @@ class TabBarSwitcher extends StatelessWidget {
             );
             var tof = uiManager.swapListener.value.interpolate(
               [0.5, 1.0],
-              [40.0, 0.0],
+              [50.0, 0.0],
             );
             return Stack(
               children: [
@@ -41,9 +42,13 @@ class TabBarSwitcher extends StatelessWidget {
                     offset: Offset(0, tof),
                     child: ClipRRect(
                       child: Container(
-                        height: 40,
+                        height: 50,
                         color: CONSTANTS.LIGHT_BLUR_COLOR,
-                        child: BlurFilter(child: Container()),
+                        child: const Center(
+                          child: BlurFilter(
+                            child: OverViewBar(),
+                          ),
+                        ),
                       ),
                     ),
                   ),

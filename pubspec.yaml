@@ -37,6 +37,7 @@ dependencies:
   remaths: ^0.0.7
   provider: ^6.0.2
   modal_bottom_sheet: ^2.0.1
+  custom_pop_up_menu: ^1.2.3+2
 
 dev_dependencies:
   flutter_test:

@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 import 'package:remaths/remaths.dart';
-import 'package:safari_clone/ui/common/widgets/background.dart';
 import 'package:safari_clone/provider/ui_manager.dart';
 
 class TabsOverview extends StatefulWidget {
@@ -35,7 +33,7 @@ class _TabsOverviewState extends State<TabsOverview> {
       crossAxisSpacing: 10,
       childAspectRatio: ratio,
       restorationId: "_tab_overview_",
-      controller: ScrollController(initialScrollOffset: _offset),
+      controller: ScrollController(initialScrollOffset: 0),
       padding: const EdgeInsets.all(10),
       children: uiManager.tabs.map((index) {
         return Hero(
@@ -51,6 +49,7 @@ class _TabsOverviewState extends State<TabsOverview> {
           child: GestureDetector(
             onTap: () {
               if (uiManager.selectedPage != index) {
+                // uiManager.selectedPage = index;
                 uiManager.gotoPage(index, false);
               }
               // experiment: wait for toToPage Animation to finish

@@ -43,7 +43,7 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
     uiManager.initSwap(swap);
     return GestureDetector(
       onPanStart: (det) {
-        _startY = det.globalPosition.dy + 100;
+        _startY = det.globalPosition.dy + 20;
       },
       onPanUpdate: (details) {
         //FIXME: animation don't work with single tab
@@ -56,8 +56,9 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
         // }
       },
       onPanEnd: (_det) {
-        if (uiManager.page < -0.6) {
-          //TODO: create a new page
+        if (uiManager.page > uiManager.tabSize + 0.5) {
+          print('new tab trigger');
+          uiManager.createNewTab();
         }
         setState(() {
           var toPage = uiManager.page.round();
@@ -126,13 +127,16 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
                     0,
                     item_with,
                   ], Extrapolate.CLAMP);
-                  var _co = width.interpolate<double>(
-                      [100, item_with], [0, 1], Extrapolate.CLAMP);
+                  var _co = width
+                      .interpolate<double>([30, 40], [0, 1], Extrapolate.CLAMP);
 
                   return Container(
                     width: width,
-                    child: NewTabItem(
-                      showContent: width > item_with * 0.8,
+                    child: Opacity(
+                      opacity: _co,
+                      child: NewTabItem(
+                        showContent: width > item_with * 0.8,
+                      ),
                     ),
                   );
                 })),
@@ -151,38 +155,24 @@ class NewTabItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: CONSTANTS.TABITEM_HEIGHT,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white54,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 5,
-            offset: const Offset(0, 3),
+    return ClipRect(
+      child: Container(
+          height: CONSTANTS.TABITEM_HEIGHT,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: Colors.white54,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 5,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: showContent
-          ? Row(
-              children: const [
-                Icon(
-                  CupertinoIcons.search,
-                  color: Colors.grey,
-                  size: 16,
-                ),
-                SizedBox(width: 5),
-                Expanded(
-                  child: Text(
-                    "Search or Enter website",
-                    overflow: TextOverflow.fade,
-                  ),
-                ),
-              ],
-            )
-          : Container(),
+          child: const Center(
+            child: Icon(CupertinoIcons.add),
+          )),
     );
   }
 }

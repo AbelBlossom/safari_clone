@@ -23,6 +23,8 @@ class UIManager extends ChangeNotifier {
 
   ValueNotifier<double> swapListener = ValueNotifier(0);
 
+  bool get hasGotoFunc => _gotoPage != null;
+
   setSwap(int value) {
     if (swap == null) return;
     swap?.value = withTiming(value.toDouble());
@@ -40,6 +42,7 @@ class UIManager extends ChangeNotifier {
   ValueNotifier<double> yListener = ValueNotifier<double>(0.0);
 
   void Function(int page, [bool withAnim])? _gotoPage;
+  void Function()? refreshTabs;
   set gotoFunc(void Function(int page, [bool withAnim]) func) {
     _gotoPage = func;
   }
@@ -49,6 +52,9 @@ class UIManager extends ChangeNotifier {
   gotoPage(int page, [bool withAnim = true]) {
     if (_gotoPage == null) return;
     _gotoPage!(page, withAnim);
+    if (refreshTabs != null) {
+      refreshTabs!();
+    }
   }
 
   double get page => _page == null ? 0.0 : _page!.value;
@@ -62,7 +68,9 @@ class UIManager extends ChangeNotifier {
   createNewTab() {
     tabs.add(tabs.length);
     selectedPage = tabs.length - 1;
-    notifyListeners();
+    if (refreshTabs != null) {
+      refreshTabs!();
+    }
   }
 
   initSwap(Tweenable _val) {

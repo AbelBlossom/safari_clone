@@ -6,5 +6,5 @@ class CONSTANTS {
   static const double TABITEM_OFFSET = 50.0;
   static const double TABITEM_HEIGHT = 40.0;
   static const double TABBAR_HEIGHT = 100.0;
-  static const Color LIGHT_BLUR_COLOR = Colors.white60;
+  static const Color LIGHT_BLUR_COLOR = Colors.white70;
 }

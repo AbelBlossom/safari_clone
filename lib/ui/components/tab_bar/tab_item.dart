@@ -1,3 +1,4 @@
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -100,14 +101,39 @@ class TabContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
+        // CupertinoButton(
+        //   padding: EdgeInsets.zero,
+        //   child: const Icon(
+        //     CupertinoIcons.textformat_size,
+        //     size: 15,
+        //     color: Colors.black,
+        //   ),
+        //   onPressed: () {},
+        // ),
         CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Icon(
-            CupertinoIcons.textformat_size,
-            size: 15,
-            color: Colors.black,
-          ),
           onPressed: () {},
+          child: CustomPopupMenu(
+            showArrow: false,
+            barrierColor: Colors.transparent,
+            menuBuilder: () {
+              return Column(
+                children: List.generate(
+                    2,
+                    (index) => Container(
+                          width: 120,
+                          height: 20,
+                          color: Colors.red,
+                        )),
+              );
+            },
+            pressType: PressType.singleClick,
+            child: const Icon(
+              CupertinoIcons.textformat_size,
+              size: 15,
+              color: Colors.black,
+            ),
+          ),
         ),
         Expanded(
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [

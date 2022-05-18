@@ -36,7 +36,7 @@ class _BrowserBackgroundState extends State<BrowserBackground> {
           child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0),
               child: Container(
-                color: Colors.white24,
+                color: Colors.transparent,
               )),
         )
       ],
