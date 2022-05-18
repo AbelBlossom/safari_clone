@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:safari_clone/ui/common/constants.dart';
 import 'package:safari_clone/provider/ui_manager.dart';
 import 'package:remaths/remaths.dart';
+import 'package:safari_clone/ui/common/widgets/pop_menu.dart';
 
 // Update the search bar when the user is trying to enter some text
 class TabItem extends StatelessWidget {
@@ -116,15 +117,38 @@ class TabContent extends StatelessWidget {
           child: CustomPopupMenu(
             showArrow: false,
             barrierColor: Colors.transparent,
+            position: PreferredPosition.top,
+            verticalMargin: 20.0,
+            horizontalMargin: CONSTANTS.TABITEM_OFFSET / 2,
             menuBuilder: () {
-              return Column(
-                children: List.generate(
-                    2,
-                    (index) => Container(
-                          width: 120,
-                          height: 20,
-                          color: Colors.red,
-                        )),
+              return PopMenu(
+                children: [
+                  PopMenuItem(
+                      title: "Show Top Address bar",
+                      onTap: () {},
+                      icon: CupertinoIcons.add),
+                  PopMenuItem(
+                      title: "Show Top Address bar",
+                      // onTap: () {},
+                      icon: CupertinoIcons.add),
+                  const PopMenuDivider(),
+                  PopMenuItem(
+                    title: "Privacy Report",
+                    subtitle: "1 Tracker Prevented",
+                    onTap: () {},
+                    icon: CupertinoIcons.square_line_vertical_square,
+                  ),
+                  PopMenuItem(
+                      title: "WebSite Settings",
+                      onTap: () {},
+                      icon: CupertinoIcons.settings),
+                  const PopMenuDivider(),
+                  PopMenuItem(
+                    title: "Share",
+                    onTap: () {},
+                    icon: CupertinoIcons.move,
+                  )
+                ],
               );
             },
             pressType: PressType.singleClick,
