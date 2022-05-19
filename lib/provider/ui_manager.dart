@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:remaths/remaths.dart';
+import 'package:safari_clone/models/position.dart';
 import 'package:safari_clone/ui/components/browser/overview.dart';
 
 class UIManager extends ChangeNotifier {
   //TODO: make this dynamic and implete the tabs switching
-  List<int> tabs = [0, 1];
+  List<int> tabs = [0, 1, 2, 3, 4];
 
   GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -22,6 +23,7 @@ class UIManager extends ChangeNotifier {
   Tweenable? swap;
 
   ValueNotifier<double> swapListener = ValueNotifier(0);
+  ValueNotifier<double> overviewSwitcher = ValueNotifier(0);
 
   bool get hasGotoFunc => _gotoPage != null;
 
@@ -42,6 +44,7 @@ class UIManager extends ChangeNotifier {
   ValueNotifier<double> yListener = ValueNotifier<double>(0.0);
 
   void Function(int page, [bool withAnim])? _gotoPage;
+  void Function(int index)? closeOverView;
   void Function()? refreshTabs;
   set gotoFunc(void Function(int page, [bool withAnim]) func) {
     _gotoPage = func;
@@ -80,6 +83,13 @@ class UIManager extends ChangeNotifier {
         swapListener.value = value;
       });
     }
+  }
+
+  initOverviewSwap(Tweenable _val) {
+    _val.addEventListener((value) {
+      // print("changed");
+      overviewSwitcher.value = value;
+    });
   }
 
   initHPos(Tweenable _val) {

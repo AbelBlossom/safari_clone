@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:remaths/remaths.dart';
+import 'package:safari_clone/provider/position_provider.dart';
 import 'package:safari_clone/ui/common/constants.dart';
 import 'package:safari_clone/ui/components/browser/overview.dart';
 import 'package:safari_clone/ui/components/tab_bar/tab_item.dart';
@@ -10,14 +11,15 @@ import 'dart:math' as math;
 
 import 'package:safari_clone/provider/ui_manager.dart';
 
-class TabSlider extends StatefulWidget {
-  const TabSlider({Key? key}) : super(key: key);
+class TabSliderTest extends StatefulWidget {
+  const TabSliderTest({Key? key}) : super(key: key);
 
   @override
-  State<TabSlider> createState() => _TabSliderState();
+  State<TabSliderTest> createState() => _TabSliderTestState();
 }
 
-class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
+class _TabSliderTestState extends State<TabSliderTest>
+    with TickerProviderStateMixin {
   late Tweenable _offset;
   late Tweenable _iPage;
   late Tweenable _y;
@@ -40,22 +42,19 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
     final size = MediaQuery.of(context).size;
     final w = size.width - CONSTANTS.TABITEM_OFFSET;
     final uiManager = context.read<UIManager>();
+    final pos = context.read<PositionProvider>();
     uiManager.initPage(_iPage);
     uiManager.initHPos(_y);
     uiManager.initSwap(swap);
+    uiManager.initOverviewSwap(_overview);
     return GestureDetector(
       onPanStart: (det) {
         _startY = det.globalPosition.dy + 20;
       },
       onPanUpdate: (details) {
-        //FIXME: animation don't work with single tab
         _offset.value -= details.delta.dx;
         uiManager.setY(
             details.globalPosition.dy.interpolate([0, _startY], [0.0, 1.0]));
-
-        // if (uiManager.page < -0.2) {
-        //   print(true);
-        // }
       },
       onPanEnd: (_det) {
         if (uiManager.page < 0) {
@@ -67,9 +66,17 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
           return;
         }
         if (uiManager.page > uiManager.tabSize + 0.5) {
-          print('new tab trigger');
           uiManager.createNewTab();
         }
+        uiManager.closeOverView ??= (index) {
+          var to = math.max(index * w, 0.0);
+          uiManager.setY(0);
+          uiManager.gotoPage(index, false);
+          _overview.value = withSpring(0);
+          uiManager.setSwap(0);
+          return;
+        };
+
         setState(() {
           var toPage = uiManager.page.round();
           var to = math.max(toPage * w, 0.0);
@@ -89,16 +96,15 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
             uiManager.setY(1.0);
           }
           _iPage.value = 0;
-          uiManager.selectedPage = to.toInt();
+          uiManager.selectedPage = page;
         };
-
-        if (uiManager.yVal < 0.5) {
-          uiManager.openOverView();
-          return;
-        }
-        // print(_det.velocity.pixelsPerSecond.dy.abs());
-        if (_det.velocity.pixelsPerSecond.dy.abs() > 2000) {
-          uiManager.openOverView();
+        print(_det.velocity.pixelsPerSecond.dy.abs());
+        if (_det.velocity.pixelsPerSecond.dy.abs() > 2000 ||
+            uiManager.yVal < 0.5) {
+          print("togoOverview");
+          pos.preserve();
+          _overview.value = withSpring(1);
+          uiManager.setSwap(1);
           return;
         }
 

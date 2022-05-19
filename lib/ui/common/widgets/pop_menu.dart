@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:safari_clone/ui/common/constants.dart';
 import 'package:safari_clone/ui/common/widgets/blur_widget.dart';
 import 'package:safari_clone/ui/common/widgets/touchable_opacity.dart';
 

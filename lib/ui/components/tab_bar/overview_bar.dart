@@ -17,11 +17,11 @@ class OverViewBar extends StatelessWidget {
             padding: const EdgeInsets.all(10.0),
             child: const Icon(CupertinoIcons.add),
             onPressed: () {
-              uiManger.createNewTab();
-              uiManger.gotoPage(uiManger.tabSize);
-              uiManger.setY(1);
-              uiManger.setSwap(0);
-              uiManger.navigatorKey.currentState!.pop();
+              // uiManger.createNewTab();
+              // uiManger.gotoPage(uiManger.tabSize);
+              // uiManger.setY(1);
+              // uiManger.setSwap(0);
+              // uiManger.navigatorKey.currentState!.pop();
             },
           ),
           Expanded(child: Center(child: Text("${uiManger.tabSize + 1} Tabs"))),

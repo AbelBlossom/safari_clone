@@ -8,6 +8,7 @@ import 'package:safari_clone/ui/common/constants.dart';
 import 'package:safari_clone/ui/common/widgets/blur_widget.dart';
 import 'package:safari_clone/ui/components/browser/overview.dart';
 import 'package:safari_clone/ui/components/tab_bar/tab_slider.dart';
+import 'package:safari_clone/ui/components/tab_bar/tab_slider.test.dart';
 import 'package:safari_clone/ui/pages/test.dart';
 import 'package:provider/provider.dart';
 
@@ -72,7 +73,9 @@ class _TabbarState extends State<Tabbar> {
             left: CONSTANTS.TABITEM_OFFSET / 2,
             right: CONSTANTS.TABITEM_OFFSET / 2,
             child: Center(
-              child: TabSlider(),
+              //TODO: uncomment this when tab slider is ready
+              // child: TabSlider(),
+              child: TabSliderTest(),
             ),
           ),
         ],

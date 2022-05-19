@@ -2,14 +2,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
+import 'package:safari_clone/provider/position_provider.dart';
 import 'package:safari_clone/ui/browser.dart';
+import 'package:safari_clone/ui/components/browser/browser.test.dart';
 import 'package:safari_clone/ui/pages/test.dart';
 import 'package:safari_clone/provider/ui_manager.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => UIManager())],
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => UIManager(),
+        ),
+        ChangeNotifierProvider(create: (_) => PositionProvider())
+      ],
       child: const MyApp(),
     ),
   );
@@ -29,7 +37,8 @@ class MyApp extends StatelessWidget {
       // home: const Browser(),
       initialRoute: "/",
       routes: <String, WidgetBuilder>{
-        '/': (BuildContext context) => const CupertinoScaffold(body: Browser()),
+        '/': (BuildContext context) =>
+            const CupertinoScaffold(body: BrowserTest()),
         "/test": (context) => const CupertinoScaffold(body: TestPage())
       },
     );
