@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:remaths/remaths.dart';
+import 'package:safari_clone/provider/position_provider.dart';
 import 'package:safari_clone/ui/common/constants.dart';
 import 'package:safari_clone/ui/components/browser/overview.dart';
 import 'package:safari_clone/ui/components/tab_bar/tab_item.dart';
@@ -40,41 +41,51 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
     final size = MediaQuery.of(context).size;
     final w = size.width - CONSTANTS.TABITEM_OFFSET;
     final uiManager = context.read<UIManager>();
+    final pos = context.read<PositionProvider>();
     uiManager.initPage(_iPage);
     uiManager.initHPos(_y);
     uiManager.initSwap(swap);
+    uiManager.initOverviewSwap(_overview);
     return GestureDetector(
       onPanStart: (det) {
         _startY = det.globalPosition.dy + 20;
       },
       onPanUpdate: (details) {
-        //FIXME: animation don't work with single tab
         _offset.value -= details.delta.dx;
         uiManager.setY(
             details.globalPosition.dy.interpolate([0, _startY], [0.0, 1.0]));
-
-        // if (uiManager.page < -0.2) {
-        //   print(true);
-        // }
       },
       onPanEnd: (_det) {
         if (uiManager.page < 0) {
           var to = math.max(0 * w, 0.0);
-          _offset.value = withSpring(to);
-          uiManager.setY(withSpring(1.0));
+          _offset.value = withTiming(to);
+          uiManager.setY(withTiming(1.0));
           _iPage.value = 0;
           uiManager.selectedPage = 0;
           return;
         }
         if (uiManager.page > uiManager.tabSize + 0.5) {
-          print('new tab trigger');
+          pos.addNewTab(size);
           uiManager.createNewTab();
         }
+        uiManager.closeOverView = (index) {
+          var to = math.max(index * w, 0.0);
+          uiManager.setY(1);
+          _offset.value = to;
+          // if (index != uiManager.selectedPage) {
+          //   uiManager.gotoPage(index, false);
+          // }
+
+          _overview.value = withTiming(0);
+          uiManager.setSwap(0);
+          return;
+        };
+
         setState(() {
           var toPage = uiManager.page.round();
           var to = math.max(toPage * w, 0.0);
-          _offset.value = withSpring(to);
-          uiManager.setY(withSpring(1.0));
+          _offset.value = withTiming(to);
+          uiManager.setY(withTiming(1.0));
           _iPage.value = 0;
           uiManager.selectedPage = toPage;
         });
@@ -82,23 +93,20 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
         uiManager.gotoFunc = (int page, [bool withAnim = true]) {
           var to = math.max(math.min(page, uiManager.tabSize) * w, 0.0);
           if (withAnim) {
-            _offset.value = withSpring(to);
-            uiManager.setY(withSpring(1.0));
+            _offset.value = withTiming(to);
+            uiManager.setY(withTiming(1.0));
           } else {
             _offset.value = to;
             uiManager.setY(1.0);
           }
           _iPage.value = 0;
-          uiManager.selectedPage = to.toInt();
+          uiManager.selectedPage = page;
         };
-
-        if (uiManager.yVal < 0.5) {
-          uiManager.openOverView();
-          return;
-        }
-        // print(_det.velocity.pixelsPerSecond.dy.abs());
-        if (_det.velocity.pixelsPerSecond.dy.abs() > 2000) {
-          uiManager.openOverView();
+        if (_det.velocity.pixelsPerSecond.dy.abs() > 2000 ||
+            uiManager.yVal < 0.5) {
+          pos.preserve();
+          _overview.value = withTiming(1);
+          uiManager.setSwap(1);
           return;
         }
 

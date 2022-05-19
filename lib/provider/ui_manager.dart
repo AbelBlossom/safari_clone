@@ -108,23 +108,4 @@ class UIManager extends ChangeNotifier {
   }
 
   bool get _hasPage => _page != null;
-
-  openOverView() {
-    setSwap(1);
-
-    navigatorKey.currentState?.push(
-      PageRouteBuilder(
-        maintainState: true,
-        pageBuilder: (context, animation, secondaryAnimation) {
-          return FadeTransition(
-            opacity: animation,
-            child: ScaleTransition(
-              scale: animation.drive(Tween(begin: 0.7, end: 1.0)),
-              child: const TabsOverview(),
-            ),
-          );
-        },
-      ),
-    );
-  }
 }

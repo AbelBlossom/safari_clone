@@ -2,14 +2,10 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:safari_clone/provider/ui_manager.dart';
 import 'package:safari_clone/ui/common/constants.dart';
 import 'package:safari_clone/ui/common/widgets/blur_widget.dart';
-import 'package:safari_clone/ui/components/browser/overview.dart';
 import 'package:safari_clone/ui/components/tab_bar/tab_slider.dart';
-import 'package:safari_clone/ui/components/tab_bar/tab_slider.test.dart';
-import 'package:safari_clone/ui/pages/test.dart';
 import 'package:provider/provider.dart';
 
 class Tabbar extends StatefulWidget {
@@ -59,7 +55,7 @@ class _TabbarState extends State<Tabbar> {
                         },
                         child: CupertinoButton(
                           child: const Icon(CupertinoIcons.square_on_square),
-                          onPressed: uiManager.openOverView,
+                          onPressed: () {},
                         ),
                       ),
                     ),
@@ -75,7 +71,7 @@ class _TabbarState extends State<Tabbar> {
             child: Center(
               //TODO: uncomment this when tab slider is ready
               // child: TabSlider(),
-              child: TabSliderTest(),
+              child: TabSlider(),
             ),
           ),
         ],

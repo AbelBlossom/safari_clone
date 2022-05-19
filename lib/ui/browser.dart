@@ -38,23 +38,11 @@ class _BrowserState extends State<Browser> {
                 child: BrowserBackground(),
               ),
               Positioned.fill(
-                child: Navigator(
-                  key: context.read<UIManager>().navigatorKey,
-                  initialRoute: "/",
-                  observers: [
-                    HeroController(),
-                  ],
-                  onGenerateRoute: (settings) {
-                    // if (settings.name == "/overview") {
-                    //   return MaterialPageRoute(
-                    //       maintainState: false,
-                    //       builder: (_) => const TabsOverview());
-                    // }
-                    return MaterialPageRoute(
-                        maintainState: false,
-                        builder: (_) => const TabViewList());
-                  },
-                ),
+                child: GestureDetector(
+                    onPanUpdate: (_det) {
+                      //
+                    },
+                    child: const TabViewList()),
               ),
               const Positioned(
                 bottom: 0,

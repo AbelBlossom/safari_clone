@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:remaths/remaths.dart';
-import 'package:safari_clone/ui/common/widgets/background.dart';
+import 'package:safari_clone/models/position.dart';
+import 'package:safari_clone/provider/position_provider.dart';
 import 'package:safari_clone/provider/ui_manager.dart';
 
 class TabViewList extends StatefulWidget {
@@ -14,25 +16,24 @@ class TabViewList extends StatefulWidget {
 class _TabViewListState extends State<TabViewList> {
   @override
   Widget build(BuildContext context) {
-    final uiManager = context.watch<UIManager>();
+    final uiManager = context.read<UIManager>();
     final size = MediaQuery.of(context).size;
+
     return AnimatedBuilder(
-      animation:
-          Listenable.merge([uiManager.offsetListener, uiManager.yListener]),
+      animation: Listenable.merge([
+        uiManager.offsetListener,
+        uiManager.yListener,
+        uiManager.overviewSwitcher,
+      ]),
       builder: (_, child) {
-        // print(uiManager.page);
+        var tabs = [...uiManager.tabs];
+        tabs.removeAt(uiManager.selectedPage);
         return Stack(
           children: [
-            //TODO: Find a way to refresh this widget when the a new tab is created
-            // suggested: pass a function from here to refresh
-            // the widget to the uiManager
-            ...uiManager.tabs
-                .map((index) => index == uiManager.selectedPage
-                    ? Container()
-                    : TabViewBuilder(key: GlobalKey(), index: index))
+            ...tabs
+                .map((index) => _TabViewBuilder(key: GlobalKey(), index: index))
                 .toList(),
-
-            TabViewBuilder(index: uiManager.selectedPage),
+            _TabViewBuilder(index: uiManager.selectedPage),
           ],
         );
       },
@@ -40,49 +41,106 @@ class _TabViewListState extends State<TabViewList> {
   }
 }
 
-class TabViewBuilder extends StatelessWidget {
+class _TabViewBuilder extends StatelessWidget {
   final int index;
-  const TabViewBuilder({Key? key, required this.index}) : super(key: key);
+  _TabViewBuilder({Key? key, required this.index}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    var uiManager = context.watch<UIManager>();
+    var uiManager = context.read<UIManager>();
+
+    var posProvider = context.read<PositionProvider>();
+    var pos = posProvider.pos[index];
+    var prev = posProvider.prev[index];
+
     var diff = uiManager.page - index;
 
-    var scale =
-        uiManager.yVal.interpolate([0.0, 1.0], [0.5, 1.0], Extrapolate.CLAMP);
-    // var hr = uiManager.yVal
-    // .interpolate([0.0, 1.0], [0.5, 1.0], Extrapolate.CLAMP);
-    final radius =
-        uiManager.yVal.interpolate([0.0, 1.0], [50.0, 0.0], Extrapolate.CLAMP);
-    final to = -1 * (diff * size.width);
+    if (uiManager.overviewSwitcher.value > 0) {
+      List<Position> _p = [];
+      var line = (((index % 2 == 0 ? index + 1 : index) + 1) / 2) - 1;
+      final ov = uiManager.overviewSwitcher.value;
+      // print(ov);
+      var p = 20;
+      var p2 = p / 2;
+      var h = size.height / 2;
+      pos.scale = ov.interpolate([0, 1], [prev.scale, 0.5]);
+      pos.height = ov.interpolate([0, 1], [prev.height, h]);
+      pos.radius = ov.interpolate([0, 1], [prev.radius, 50]);
+      pos.width = ov.interpolate([0, 1], [prev.width, size.width - p]);
+      pos.y = ov.interpolate([0, 1], [0, (line * (h + 20)) - ((h / 2) - p)]);
+      pos.x = ov.interpolate(
+        [0, 1],
+        [prev.x, index % 2 == 0 ? -(size.width / 2) + p : (size.width / 2) + p],
+      );
+    } else {
+      // print("else hit");
+      pos.y = 0;
+      pos.scale =
+          uiManager.yVal.interpolate([0.0, 1.0], [0.5, 1.0], Extrapolate.CLAMP);
+
+      pos.radius = uiManager.yVal
+          .interpolate([0.0, 1.0], [50.0, 0.0], Extrapolate.CLAMP);
+      pos.x = -1 * (diff * size.width);
+      pos.width = size.width - pos.radius;
+
+      pos.height = size.height * pos.scale;
+    }
+
     return Positioned(
-        top: 0,
-        left: 0,
-        child: Transform.scale(
-          scale: scale.abs(),
-          child: Transform.translate(
-            offset: Offset(to, 0),
+      top: 0,
+      left: 0,
+      child: Transform.scale(
+        scale: pos.scale,
+        child: Transform.translate(
+          offset: Offset(pos.x, pos.y),
+          child: InkWell(
+            onTap: uiManager.overviewSwitcher.value > 0
+                ? () async {
+                    uiManager.selectedPage = index;
+                    // uiManager.page = index;
+                    await posProvider.resetPrev(size, index);
+                    // print(index);
+                    if (uiManager.closeOverView != null) {
+                      uiManager.closeOverView!(index);
+                    }
+
+                    // Future.delayed(duration)
+                  }
+                : null,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(radius),
-              child: Hero(
-                tag: "tab_$index",
-                child: Container(
+              borderRadius: BorderRadius.circular(pos.radius),
+              child: IgnorePointer(
+                ignoring: uiManager.overviewSwitcher.value > 0,
+                child: SizedBox(
                   // margin: EdgeInsets.symmetric(horizontal: 50),
-                  width: size.width - radius,
-                  height: size.height * scale,
-                  color: index % 2 == 0
-                      ? CupertinoColors.activeBlue
-                      : CupertinoColors.activeGreen,
-                  child: CupertinoButton(
-                    onPressed: () {},
-                    child: Text("TRY"),
-                  ),
+
+                  width: pos.width,
+                  height: pos.height,
+                  child: TabContent(index: index),
                 ),
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class TabContent extends StatelessWidget {
+  final int index;
+  const TabContent({Key? key, required this.index}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        color: index % 2 == 0
+            ? CupertinoColors.systemGrey6
+            : CupertinoColors.systemGrey4,
+        child: CupertinoButton(
+          onPressed: () {},
+          child: Text("$index"),
         ));
   }
 }
