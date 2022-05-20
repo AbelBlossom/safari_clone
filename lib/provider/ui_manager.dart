@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:remaths/remaths.dart';
 import 'package:safari_clone/models/position.dart';
 import 'package:safari_clone/ui/components/browser/overview.dart';
+import 'package:safari_clone/ui/components/tab_bar/tab_slider.dart';
 
 class UIManager extends ChangeNotifier {
   //TODO: make this dynamic and implete the tabs switching
@@ -29,7 +30,7 @@ class UIManager extends ChangeNotifier {
 
   setSwap(int value) {
     if (swap == null) return;
-    swap?.value = withTiming(value.toDouble());
+    swap?.value = animTo(value.toDouble());
   }
 
   setY(dynamic val) {

@@ -5,6 +5,7 @@ import 'package:remaths/remaths.dart';
 import 'package:safari_clone/models/position.dart';
 import 'package:safari_clone/provider/position_provider.dart';
 import 'package:safari_clone/provider/ui_manager.dart';
+import 'package:safari_clone/ui/components/tab_bar/tab_slider.dart';
 
 class TabViewList extends StatefulWidget {
   const TabViewList({Key? key}) : super(key: key);
@@ -17,6 +18,7 @@ class _TabViewListState extends State<TabViewList> {
   @override
   Widget build(BuildContext context) {
     final uiManager = context.read<UIManager>();
+    final pos = context.read<PositionProvider>();
     final size = MediaQuery.of(context).size;
 
     return AnimatedBuilder(
@@ -24,6 +26,7 @@ class _TabViewListState extends State<TabViewList> {
         uiManager.offsetListener,
         uiManager.yListener,
         uiManager.overviewSwitcher,
+        context.read<PositionProvider>().yListener,
       ]),
       builder: (_, child) {
         var tabs = [...uiManager.tabs];
@@ -51,6 +54,7 @@ class _TabViewBuilder extends StatelessWidget {
     var uiManager = context.read<UIManager>();
 
     var posProvider = context.read<PositionProvider>();
+
     var pos = posProvider.pos[index];
     var prev = posProvider.prev[index];
 
@@ -64,15 +68,25 @@ class _TabViewBuilder extends StatelessWidget {
       var p = 20;
       var p2 = p / 2;
       var h = size.height / 2;
+      var ch = (line * (h + 20)) - ((h / 2) - p);
       pos.scale = ov.interpolate([0, 1], [prev.scale, 0.5]);
       pos.height = ov.interpolate([0, 1], [prev.height, h]);
       pos.radius = ov.interpolate([0, 1], [prev.radius, 50]);
       pos.width = ov.interpolate([0, 1], [prev.width, size.width - p]);
-      pos.y = ov.interpolate([0, 1], [0, (line * (h + 20)) - ((h / 2) - p)]);
+      pos.y = ov.interpolate([
+        0,
+        1
+      ], [
+        0,
+        ov == 1 ? ch + posProvider.pageY : pos.prevY,
+      ]);
       pos.x = ov.interpolate(
         [0, 1],
         [prev.x, index % 2 == 0 ? -(size.width / 2) + p : (size.width / 2) + p],
       );
+      if (ov == 1) {
+        pos.prevY = pos.y;
+      }
     } else {
       // print("else hit");
       pos.y = 0;
@@ -100,6 +114,7 @@ class _TabViewBuilder extends StatelessWidget {
                     uiManager.selectedPage = index;
                     // uiManager.page = index;
                     await posProvider.resetPrev(size, index);
+                    posProvider.pageY = animTo(0);
                     // print(index);
                     if (uiManager.closeOverView != null) {
                       uiManager.closeOverView!(index);

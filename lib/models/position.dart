@@ -6,6 +6,8 @@ class Position {
   double height;
   double width;
 
+  double prevY = 0;
+
   Position({
     this.scale = 1.0,
     this.x = 0.0,

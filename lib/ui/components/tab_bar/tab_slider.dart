@@ -11,6 +11,10 @@ import 'dart:math' as math;
 
 import 'package:safari_clone/provider/ui_manager.dart';
 
+animTo(double val) {
+  return withTiming(val, duration: 300, curve: Curves.easeInOut);
+}
+
 class TabSlider extends StatefulWidget {
   const TabSlider({Key? key}) : super(key: key);
 
@@ -24,6 +28,7 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
   late Tweenable _y;
   late Tweenable swap;
   double _startY = 0.0;
+  late Tweenable pageY;
   late Tweenable _overview;
 
   @override
@@ -33,6 +38,7 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
     _y = 1.0.asTweenable(this);
     swap = 0.0.asTweenable(this);
     _overview = 0.0.asTweenable(this);
+    pageY = 0.0.asTweenable(this);
     super.initState();
   }
 
@@ -42,6 +48,7 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
     final w = size.width - CONSTANTS.TABITEM_OFFSET;
     final uiManager = context.read<UIManager>();
     final pos = context.read<PositionProvider>();
+    pos.initPageY(pageY);
     uiManager.initPage(_iPage);
     uiManager.initHPos(_y);
     uiManager.initSwap(swap);
@@ -58,8 +65,8 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
       onPanEnd: (_det) {
         if (uiManager.page < 0) {
           var to = math.max(0 * w, 0.0);
-          _offset.value = withTiming(to);
-          uiManager.setY(withTiming(1.0));
+          _offset.value = animTo(to);
+          uiManager.setY(animTo(1.0));
           _iPage.value = 0;
           uiManager.selectedPage = 0;
           return;
@@ -72,9 +79,6 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
           var to = math.max(index * w, 0.0);
           uiManager.setY(1);
           _offset.value = to;
-          // if (index != uiManager.selectedPage) {
-          //   uiManager.gotoPage(index, false);
-          // }
 
           _overview.value = withTiming(0);
           uiManager.setSwap(0);
@@ -84,8 +88,8 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
         setState(() {
           var toPage = uiManager.page.round();
           var to = math.max(toPage * w, 0.0);
-          _offset.value = withTiming(to);
-          uiManager.setY(withTiming(1.0));
+          _offset.value = animTo(to);
+          uiManager.setY(animTo(1.0));
           _iPage.value = 0;
           uiManager.selectedPage = toPage;
         });
@@ -93,8 +97,8 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
         uiManager.gotoFunc = (int page, [bool withAnim = true]) {
           var to = math.max(math.min(page, uiManager.tabSize) * w, 0.0);
           if (withAnim) {
-            _offset.value = withTiming(to);
-            uiManager.setY(withTiming(1.0));
+            _offset.value = animTo(to);
+            uiManager.setY(animTo(1.0));
           } else {
             _offset.value = to;
             uiManager.setY(1.0);
@@ -104,8 +108,12 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
         };
         if (_det.velocity.pixelsPerSecond.dy.abs() > 2000 ||
             uiManager.yVal < 0.5) {
+          var page = uiManager.selectedPage;
+          var offset = -1 * (size.height * 0.3) * (page / 2);
+          pos.pageY = offset;
           pos.preserve();
-          _overview.value = withTiming(1);
+          _overview.value = animTo(1);
+          //TODO: set the scroll offset to the current page
           uiManager.setSwap(1);
           return;
         }
