@@ -21,4 +21,8 @@ class Position {
   String toString() {
     return "(x: $x) (scale: $scale) (y: $y) (radius: $radius) (height: $height) (width: $width)";
   }
+
+  static getLine(int index) {
+    return (((index % 2 == 0 ? index + 1 : index) + 1) / 2) - 1;
+  }
 }

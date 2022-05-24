@@ -31,13 +31,25 @@ class _TabViewListState extends State<TabViewList> {
       builder: (_, child) {
         var tabs = [...uiManager.tabs];
         tabs.removeAt(uiManager.selectedPage);
-        return Stack(
-          children: [
-            ...tabs
-                .map((index) => _TabViewBuilder(key: GlobalKey(), index: index))
-                .toList(),
-            _TabViewBuilder(index: uiManager.selectedPage),
-          ],
+        return SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          controller: pos.controller,
+          physics: uiManager.overviewSwitcher.value != 1
+              ? const NeverScrollableScrollPhysics()
+              : const BouncingScrollPhysics(),
+          child: SizedBox(
+            height: max(size.height * 0.3 * Position.getLine(uiManager.tabSize),
+                size.height),
+            child: Stack(
+              children: [
+                ...tabs
+                    .map((index) =>
+                        _TabViewBuilder(key: GlobalKey(), index: index))
+                    .toList(),
+                _TabViewBuilder(index: uiManager.selectedPage),
+              ],
+            ),
+          ),
         );
       },
     );
@@ -62,7 +74,7 @@ class _TabViewBuilder extends StatelessWidget {
 
     if (uiManager.overviewSwitcher.value > 0) {
       List<Position> _p = [];
-      var line = (((index % 2 == 0 ? index + 1 : index) + 1) / 2) - 1;
+      var line = Position.getLine(index);
       final ov = uiManager.overviewSwitcher.value;
       // print(ov);
       var p = 20;
@@ -77,8 +89,8 @@ class _TabViewBuilder extends StatelessWidget {
         0,
         1
       ], [
-        0,
-        ov == 1 ? ch + posProvider.pageY : pos.prevY,
+        posProvider.controller.offset,
+        ch,
       ]);
       pos.x = ov.interpolate(
         [0, 1],
@@ -89,7 +101,7 @@ class _TabViewBuilder extends StatelessWidget {
       }
     } else {
       // print("else hit");
-      pos.y = 0;
+      pos.y = posProvider.controller.offset;
       pos.scale =
           uiManager.yVal.interpolate([0.0, 1.0], [0.5, 1.0], Extrapolate.CLAMP);
 
@@ -100,12 +112,13 @@ class _TabViewBuilder extends StatelessWidget {
 
       pos.height = size.height * pos.scale;
     }
-
+    // print("$index ${pos.y}");
     return Positioned(
       top: 0,
       left: 0,
       child: Transform.scale(
         scale: pos.scale,
+        origin: Offset(0, max(posProvider.controller.offset, size.height / 5)),
         child: Transform.translate(
           offset: Offset(pos.x, pos.y),
           child: InkWell(
@@ -114,7 +127,7 @@ class _TabViewBuilder extends StatelessWidget {
                     uiManager.selectedPage = index;
                     // uiManager.page = index;
                     await posProvider.resetPrev(size, index);
-                    posProvider.pageY = animTo(0);
+
                     // print(index);
                     if (uiManager.closeOverView != null) {
                       uiManager.closeOverView!(index);

@@ -33,8 +33,8 @@ class _BrowserState extends State<Browser> {
         // topRadius: const Radius.circular(20),
         body: CupertinoPageScaffold(
           child: Stack(
-            children: [
-              const Positioned(
+            children: const [
+              Positioned(
                 top: 0,
                 bottom: 0,
                 right: 0,
@@ -42,39 +42,9 @@ class _BrowserState extends State<Browser> {
                 child: BrowserBackground(),
               ),
               Positioned.fill(
-                child: GestureDetector(
-                    onPanUpdate: (_det) {
-                      if (ui.overviewSwitcher.value == 1) {
-                        var pageY = pos.pageY;
-                        pos.pageY = _det.delta.dy + pageY;
-                      }
-                    },
-                    onPanDown: (_) {
-                      pos.pageY = pos.pageY;
-                    },
-                    onPanEnd: (_det) {
-                      if (ui.overviewSwitcher.value == 1) {
-                        //TODO: scroll to the correct position
-                        if (pos.pageY > 0) {
-                          pos.pageY = withSpring(0.0);
-                          return;
-                        }
-                        var y = pos.pageY;
-                        var velocity = _det.velocity.pixelsPerSecond.dy;
-                        var v = velocity.interpolate([-5000.0, 5000.0],
-                            [-1000.0, 1000.0], Extrapolate.CLAMP).toDouble();
-                        var time = v.abs().interpolate([0, 1000.0],
-                            [100.0, 500.0], Extrapolate.CLAMP).toInt();
-                        pos.pageY = withTiming(
-                          min((y + v), 0.0),
-                          duration: time,
-                          curve: Curves.linear,
-                        );
-                      }
-                    },
-                    child: const TabViewList()),
+                child: TabViewList(),
               ),
-              const Positioned(
+              Positioned(
                 bottom: 0,
                 left: 0,
                 right: 0,

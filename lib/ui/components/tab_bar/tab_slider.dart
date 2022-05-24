@@ -28,7 +28,6 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
   late Tweenable _y;
   late Tweenable swap;
   double _startY = 0.0;
-  late Tweenable pageY;
   late Tweenable _overview;
 
   @override
@@ -38,7 +37,6 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
     _y = 1.0.asTweenable(this);
     swap = 0.0.asTweenable(this);
     _overview = 0.0.asTweenable(this);
-    pageY = 0.0.asTweenable(this);
     super.initState();
   }
 
@@ -48,7 +46,6 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
     final w = size.width - CONSTANTS.TABITEM_OFFSET;
     final uiManager = context.read<UIManager>();
     final pos = context.read<PositionProvider>();
-    pos.initPageY(pageY);
     uiManager.initPage(_iPage);
     uiManager.initHPos(_y);
     uiManager.initSwap(swap);
@@ -56,26 +53,16 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
     return GestureDetector(
       onPanStart: (det) {
         _startY = det.globalPosition.dy + 20;
+        print("start: $_startY size: ${size.height}");
       },
       onPanUpdate: (details) {
         _offset.value -= details.delta.dx;
-        uiManager.setY(
-            details.globalPosition.dy.interpolate([0, _startY], [0.0, 1.0]));
+        print("DY: ${details.globalPosition.dy} size: ${size.height}");
+        uiManager.setY(details.globalPosition.dy
+            .interpolate([0, size.height], [0.0, 1.0]));
       },
       onPanEnd: (_det) {
-        if (uiManager.page < 0) {
-          var to = math.max(0 * w, 0.0);
-          _offset.value = animTo(to);
-          uiManager.setY(animTo(1.0));
-          _iPage.value = 0;
-          uiManager.selectedPage = 0;
-          return;
-        }
-        if (uiManager.page > uiManager.tabSize + 0.5) {
-          pos.addNewTab(size);
-          uiManager.createNewTab();
-        }
-        uiManager.closeOverView = (index) {
+        uiManager.closeOverView ??= (index) {
           var to = math.max(index * w, 0.0);
           uiManager.setY(1);
           _offset.value = to;
@@ -84,15 +71,6 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
           uiManager.setSwap(0);
           return;
         };
-
-        setState(() {
-          var toPage = uiManager.page.round();
-          var to = math.max(toPage * w, 0.0);
-          _offset.value = animTo(to);
-          uiManager.setY(animTo(1.0));
-          _iPage.value = 0;
-          uiManager.selectedPage = toPage;
-        });
 
         uiManager.gotoFunc = (int page, [bool withAnim = true]) {
           var to = math.max(math.min(page, uiManager.tabSize) * w, 0.0);
@@ -105,6 +83,7 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
           }
           _iPage.value = 0;
           uiManager.selectedPage = page;
+          return;
         };
         if (_det.velocity.pixelsPerSecond.dy.abs() > 2000 ||
             uiManager.yVal < 0.5) {
@@ -115,10 +94,31 @@ class _TabSliderState extends State<TabSlider> with TickerProviderStateMixin {
           _overview.value = animTo(1);
           //TODO: set the scroll offset to the current page
           uiManager.setSwap(1);
-          return;
+        }
+
+        if (uiManager.page > uiManager.tabSize + 0.5) {
+          pos.addNewTab(size);
+          uiManager.createNewTab();
+        }
+
+        if (uiManager.page < 0) {
+          var to = math.max(0 * w, 0.0);
+          _offset.value = animTo(to);
+          uiManager.setY(animTo(1.0));
+          _iPage.value = 0;
+          uiManager.selectedPage = 0;
         }
 
         // uiManager.gotoPage(toPage);
+
+        setState(() {
+          var toPage = uiManager.page.round();
+          var to = math.max(toPage * w, 0.0);
+          _offset.value = animTo(to);
+          uiManager.setY(animTo(1.0));
+          // _iPage.value = 0;
+          uiManager.selectedPage = toPage;
+        });
       },
       child: AnimatedBuilder(
         animation: _offset.notifier,

@@ -8,35 +8,18 @@ class PositionProvider {
   List<Position> pos =
       [0, 1, 2, 3, 4].map((_) => Position()).toList().toList(growable: true);
 
-  Tweenable? _pageY;
+  double pageY = 0;
   bool isAnimating = true;
 
+  ScrollController controller = ScrollController();
+
   late List<Position> prev;
+
   PositionProvider() {
     prev = pos;
-  }
-
-  set pageY(dynamic value) {
-    if (_pageY == null) {
-      return;
-    }
-    _pageY!.value = value;
-  }
-
-  double get pageY {
-    if (_pageY == null) {
-      return 0.0;
-    }
-    return _pageY!.value;
-  }
-
-  initPageY(Tweenable y) {
-    _pageY = y;
-    _pageY!.addEventListener((value) {
-      yListener.value = value;
-      if (value == 1) {
-        isAnimating = false;
-      }
+    controller.addListener(() {
+      pageY = controller.offset;
+      print(controller.offset);
     });
   }
 
